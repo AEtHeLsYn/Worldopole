@@ -13,7 +13,7 @@
 
 <div class="row area">
 
-	<div class="col-md-3 col-sm-6 col-xs-12 big-data"> <!-- LIVEMON -->
+	<div class="col-md-4 col-sm-6 col-xs-12 big-data"> <!-- LIVEMON -->
 		<a href="pokemon">
 			<img src="core/img/pokeball.png" alt="Visit the <?= $config->infos->site_name ?> Pokedex" width=50 class="big-icon">
 			<p><big><strong class="total-pkm-js">0</strong> Pokémon</big><br>
@@ -21,7 +21,7 @@
 		</a>
 	</div>
 
-	<div class="col-md-3 col-sm-6 col-xs-12 big-data" style="border-right:1px lightgray solid;border-left:1px lightgray solid;"> <!-- GYMS -->
+	<div class="col-md-4 col-sm-6 col-xs-12 big-data" style="border-right:1px lightgray solid;border-left:1px lightgray solid;"> <!-- GYMS -->
 		<a href="gym">
 			<img src="core/img/rocket.png" alt="Discover the <?= $config->infos->site_name ?> Gyms" width=50 class="big-icon">
 			<p><big><strong class="total-gym-js">0</strong> <?= $locales->GYMS ?></big><br>
@@ -30,7 +30,7 @@
 
 	</div>
 
-	<div class="col-md-3 col-sm-6 col-xs-12 big-data" style="border-right:1px lightgray solid;"> <!-- POKESTOPS -->
+	<div class="col-md-4 col-sm-6 col-xs-12 big-data" style="border-right:1px lightgray solid;"> <!-- POKESTOPS -->
 		<a href="pokestops">
 			<img src="core/img/lure-module.png" alt="Discover the <?= $config->infos->site_name ?> Pokéstops" width=50 class="big-icon">
 			<p><big><strong class="total-lure-js">0</strong> <?= $locales->LURES ?></big><br>
@@ -38,12 +38,6 @@
 		</a>
 	</div>
 
-	<div class="col-md-3 col-sm-6 col-xs-12 big-data">
-		<a href="<?= $config->homewidget->url ?>" target="_blank">
-			<img src="<?= $config->homewidget->image ?>" alt="<?= $config->homewidget->image_alt ?>" width=50 class="big-icon">
-			<p><?= $config->homewidget->text ?></p>
-		</a>
-	</div>
 
 </div>
 
