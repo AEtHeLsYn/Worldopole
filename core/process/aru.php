@@ -196,7 +196,7 @@ switch ($request) {
 
 				$html = '
 			    <div class="col-md-1 col-xs-4 pokemon-single" data-pokeid="'.$pokeid.'" data-pokeuid="'.$pokeuid.'" style="display: none;">
-				<a href="pokemon/'.$pokeid.'"><img src="core/pokemons/'.$pokeid.$config->system->pokeimg_suffix.'" alt="'.$pokemons->pokemon->$pokeid->name.'" class="img-responsive"></a>
+				<a href="pokemon/'.$pokeid.'"><img src="'.$pokemons->pokemon->$pokeid->img.'" alt="'.$pokemons->pokemon->$pokeid->name.'" class="img-responsive"></a>
 				<a href="pokemon/'.$pokeid.'"><p class="pkmn-name">'.$pokemons->pokemon->$pokeid->name.'</p></a>
 				<a href="'.$location_link.'" target="_blank">
 					<small class="pokemon-timer">00:00:00</small>
@@ -282,15 +282,8 @@ switch ($request) {
 
 	case 'pokestop':
 		$where = "";
-		if ($config->system->only_lured_pokestops) {
-			$where = "WHERE lure_expiration > UTC_TIMESTAMP() ORDER BY lure_expiration";
-		}
-		$req = "SELECT latitude, longitude, lure_expiration, UTC_TIMESTAMP() AS now, (CONVERT_TZ(lure_expiration, '+00:00', '".$time_offset."')) AS lure_expiration_real FROM pokestop ".$where."";
+		$req = "SELECT latitude, longitude, lure_expiration, UTC_TIMESTAMP() AS now, (CONVERT_TZ(lure_expiration, '+00:00', '".$time_offset."')) AS lure_expiration_real FROM pokestop ";
 
-		//show all stops if no lure active
-		if (!$mysqli->query($req)->fetch_object()) {
-			$req = "SELECT latitude, longitude, lure_expiration, UTC_TIMESTAMP() AS now, (CONVERT_TZ(lure_expiration, '+00:00', '".$time_offset."')) AS lure_expiration_real FROM pokestop";
-		}
 		$result = $mysqli->query($req);
 
 		$pokestops = [];
@@ -299,16 +292,19 @@ switch ($request) {
 			if ($data->lure_expiration >= $data->now) {
 				$icon = 'pokestap_lured.png';
 				$text = sprintf($locales->POKESTOPS_MAP_LURED, date('H:i:s', strtotime($data->lure_expiration_real)));
+				$lured = true;
 			} else {
 				$icon = 'pokestap.png';
 				$text = $locales->POKESTOPS_MAP_REGULAR;
+				$lured = false;
 			}
 
 			$pokestops[] = [
 				$text,
 				$icon,
 				$data->latitude,
-				$data->longitude
+				$data->longitude,
+				$lured
 			];
 		}
 
@@ -456,11 +452,12 @@ switch ($request) {
 		while ($data = $result->fetch_object()) {
 			$gymData['gymDetails']['pokemons'][] = $data;
 			if ($data != false) {
+				$pokemon_id = $data->pokemon_id;
 				if ($config->system->iv_numbers) {
 					$gymData['infoWindow'] .= '
 					<div style="text-align: center; width: 50px; display: inline-block; margin-right: 3px">
 						<a href="pokemon/'.$data->pokemon_id.'">
-						<img src="core/pokemons/'.$data->pokemon_id.$config->system->pokeimg_suffix.'" height="50" style="display:inline-block" >
+						<img src="'.$pokemons->pokemon->$pokemon_id->img.'" height="50" style="display:inline-block" >
 						</a>
 						<p class="pkmn-name">'.$data->cp.'</p>
 						<div class="progress" style="height: 12px; margin-bottom: 0">
@@ -479,7 +476,7 @@ switch ($request) {
 					$gymData['infoWindow'] .= '
 					<div style="text-align: center; width: 50px; display: inline-block; margin-right: 3px">
 						<a href="pokemon/'.$data->pokemon_id.'">
-						<img src="core/pokemons/'.$data->pokemon_id.$config->system->pokeimg_suffix.'" height="50" style="display:inline-block" >
+						<img src="'.$pokemons->pokemon->$pokemon_id->img.'" height="50" style="display:inline-block" >
 						</a>
 						<p class="pkmn-name">'.$data->cp.'</p>
 						<div class="progress" style="height: 4px; width: 40px; margin-bottom: 10px; margin-top: 2px; margin-left: auto; margin-right: auto">
@@ -496,10 +493,11 @@ switch ($request) {
 					</div>'
 						; }
 			} else {
+				$pokemon_id = $gymData['gymDetails']['gymInfos']['guardPokemonId'];
 				$gymData['infoWindow'] .= '
 				<div style="text-align: center; width: 50px; display: inline-block; margin-right: 3px">
 					<a href="pokemon/'.$gymData['gymDetails']['gymInfos']['guardPokemonId'].'">
-					<img src="core/pokemons/'.$gymData['gymDetails']['gymInfos']['guardPokemonId'].$config->system->pokeimg_suffix.'" height="50" style="display:inline-block" >
+					<img src="'.$pokemons->pokemon->$pokemon_id->img.'" height="50" style="display:inline-block" >
 					</a>
 					<p class="pkmn-name">???</p>
 				</div>'
@@ -524,10 +522,11 @@ switch ($request) {
 			$gymData['gymDetails']['gymInfos']['team'] = $data->team_id;
 			$gymData['gymDetails']['gymInfos']['guardPokemonId'] = $data->guard_pokemon_id;
 
+			$pokemon_id = $data->guard_pokemon_id;
 			$gymData['infoWindow'] .= '
 				<div style="text-align: center; width: 50px; display: inline-block; margin-right: 3px">
 					<a href="pokemon/'.$data->guard_pokemon_id.'">
-					<img src="core/pokemons/'.$data->guard_pokemon_id.$config->system->pokeimg_suffix.'" height="50" style="display:inline-block" >
+					<img src="'.$pokemons->pokemon->$pokemon_id->img.'" height="50" style="display:inline-block" >
 					</a>
 					<p class="pkmn-name">???</p>
 				</div>';
